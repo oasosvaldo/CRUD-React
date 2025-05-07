@@ -1,9 +1,7 @@
-// src/components/Form.js
-import '../components/Form.css';
 import React, { useState, useEffect } from 'react';
 import { createItem, updateItem } from '../api';
 
-const Form = ({ selectedItem, onSaved }) => {
+const Form = ({ itemToUpdate, refreshList }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -12,14 +10,16 @@ const Form = ({ selectedItem, onSaved }) => {
 
   // Preenche o formulário ao selecionar um item para editar
   useEffect(() => {
-    if (selectedItem) {
+    if (itemToUpdate) {
       setFormData({
-        name: selectedItem.name,
-        email: selectedItem.email,
-        phone: selectedItem.phone,
+        name: itemToUpdate.name,
+        email: itemToUpdate.email,
+        phone: itemToUpdate.phone,
       });
+    } else {
+      setFormData({ name: '', email: '', phone: '' }); // Limpa quando não há item para editar
     }
-  }, [selectedItem]);
+  }, [itemToUpdate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -29,13 +29,12 @@ const Form = ({ selectedItem, onSaved }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (selectedItem) {
-        await updateItem(selectedItem.id, formData);
+      if (itemToUpdate) {
+        await updateItem(itemToUpdate.id, formData);
       } else {
         await createItem(formData);
       }
-      setFormData({ name: '', email: '', phone: '' });
-      onSaved(); // Atualiza lista
+      refreshList(); // Atualiza a lista
     } catch (error) {
       console.error('Erro ao salvar item:', error);
     }
@@ -44,7 +43,7 @@ const Form = ({ selectedItem, onSaved }) => {
   return (
     <div className='formularioCadastro'>
       <form onSubmit={handleSubmit}>
-        <h2>{selectedItem ? 'Editar Item' : 'Cadastrar Item'}</h2>
+        <h2>{itemToUpdate ? 'Editar Item' : 'Cadastrar Item'}</h2>
         <input
           type="text"
           name="name"
@@ -69,9 +68,8 @@ const Form = ({ selectedItem, onSaved }) => {
           onChange={handleChange}
           required
         />
-        <button type="submit">{selectedItem ? 'Atualizar' : 'Cadastrar'}</button>
+        <button type="submit">{itemToUpdate ? 'Atualizar' : 'Cadastrar'}</button>
       </form>
-
     </div>
   );
 };

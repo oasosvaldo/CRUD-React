@@ -9,7 +9,9 @@ const server = express();
 server.use(express.json());
 
 // ✅ ATIVE O CORS AQUI
-server.use(cors());
+server.use(cors({
+  origin: 'http://localhost:3001', // Permite somente o frontend na porta 3001
+}));
 
 // Middleware JSON
 server.use(express.json({ extended: true }));
