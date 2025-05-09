@@ -31,8 +31,9 @@ const Form = ({ itemToUpdate, refreshList }) => {
     try {
       if (itemToUpdate) {
         await updateItem(itemToUpdate.id, formData);
-      } else {
+      } else {console.log('Tentando cadastrar:', formData);
         await createItem(formData);
+        console.log('Cadastro realizado com sucesso!');        
       }
       refreshList(); // Atualiza a lista
     } catch (error) {

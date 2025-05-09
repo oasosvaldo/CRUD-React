@@ -1,33 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import Form from './components/Form';
 import List from './components/List';
-import { getItems } from './api'; // Para pegar a lista de itens
+import { getItems, deleteItem } from './api'; // 👈 adicione deleteItem
 
 const App = () => {
   const [itemToUpdate, setItemToUpdate] = useState(null);
   const [items, setItems] = useState([]);
 
-  // Função para atualizar a lista de itens após salvar/editar um item
   const refreshList = async () => {
     const itemsFromServer = await getItems();
     setItems(itemsFromServer);
-    setItemToUpdate(null); // Limpa o item que estava sendo editado
+    setItemToUpdate(null);
   };
 
-  // Carregar a lista de itens ao iniciar o app
   useEffect(() => {
     refreshList();
   }, []);
 
+  // 👇 Função para excluir item
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm('Tem certeza que deseja excluir este item?');
+    if (!confirmDelete) return;
+  
+    try {
+      await deleteItem(id);
+      refreshList();
+    } catch (error) {
+      console.error('Erro ao excluir item:', error);
+    }
+  };
+  
+
   return (
     <div>
       <h1>CRUD App</h1>
-      
-      {/* Formulário de cadastro/edição */}
       <Form itemToUpdate={itemToUpdate} refreshList={refreshList} />
-
-      {/* Lista de itens */}
-      <List items={items} setItemToUpdate={setItemToUpdate} />
+      <List
+        items={items}
+        setItemToUpdate={setItemToUpdate}
+        onDelete={handleDelete} // 👈 Passa função de exclusão
+      />
     </div>
   );
 };
